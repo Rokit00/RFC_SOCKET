@@ -21,9 +21,9 @@ public class SocketServiceImpl implements SocketService {
     public void setKRWSocket() {
         try {
             socket = new Socket(properties.getProperty("SOCKET.IP"), Integer.parseInt(properties.getProperty("SOCKET.PORT.KRW")));
-            log.info("--Connected to server {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KRW"));
+            log.info("CONNECTED TO VAN {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KRW"));
         } catch (IOException e) {
-            log.error("Failed to connect to server: {}", e.getMessage());
+            log.error("FAILED TO CONNECT TO VAN: {}", e.getMessage());
         }
     }
 
@@ -31,9 +31,9 @@ public class SocketServiceImpl implements SocketService {
     public void setKEBSocket() {
         try {
             socket = new Socket(properties.getProperty("SOCKET.IP"), Integer.parseInt(properties.getProperty("SOCKET.PORT.KEB")));
-            log.info("--Connected to server {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KEB"));
+            log.info("CONNECTED TO VAN {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KEB"));
         } catch (IOException e) {
-            log.error("Failed to connect to server: {}", e.getMessage());
+            log.error("FAILED TO CONNECT TO VAN: {}", e.getMessage());
         }
     }
 
@@ -42,10 +42,10 @@ public class SocketServiceImpl implements SocketService {
         try {
             if (socket != null) {
                 socket.close();
-                log.info("--Disconnected from server");
+                log.info("DISCONNECTED TO VAN");
             }
         } catch (IOException e) {
-            log.error("Failed to disconnect from server: {}", e.getMessage());
+            log.error("FAILED TO DISCONNECT FROM VAN: {}", e.getMessage());
         }
     }
 
@@ -58,8 +58,8 @@ public class SocketServiceImpl implements SocketService {
                 setKRWSocket();
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 byte[] toBytes = truncateToBytes(importParam, 300);
-                log.info("--DATA: [{}byte] [{}]", toBytes.length, importParam);
-                log.info("--TYPE: {}", importParam1);
+                log.info("CONTENT: [{}byte] [{}]", toBytes.length, importParam);
+                log.info("TYPE: {}", importParam1);
 
                 outputStream.write(toBytes);
                 outputStream.flush();
@@ -67,14 +67,14 @@ public class SocketServiceImpl implements SocketService {
                 setKEBSocket();
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 byte[] toBytes = truncateToBytes(importParam, 2000);
-                log.info("--DATA: [{}byte] [{}]", toBytes.length, importParam);
-                log.info("--TYPE: {}", importParam1);
+                log.info("DATA: [{}byte] [{}]", toBytes.length, importParam);
+                log.info("TYPE: {}", importParam1);
 
                 outputStream.write(toBytes);
                 outputStream.flush();
             }
 
-            log.info("--Data sent to server");
+            log.info("DATA SENT TO VAN");
 
             DataInputStream reader = new DataInputStream(socket.getInputStream());
 
@@ -86,19 +86,19 @@ public class SocketServiceImpl implements SocketService {
             String receivedMessage = messageBuilder.toString();
 
             if (receivedMessage.isEmpty()) {
-                log.info("No data received from server");
+                log.info("NO DATA RECEIVED FROM VAN");
                 return "F";
             }
 
-            log.info("--received DATA: [{}byte] [{}]", receivedMessage.length(), receivedMessage);
+            log.info("DATA RECEIVED FROM VAN: [{}byte] [{}]", receivedMessage.length(), receivedMessage);
             setSendToSap(receivedMessage, receivedMessage);
 
             long endTime = System.currentTimeMillis() - startTime;
-            log.info("--[SOCKET SEND SUCCESS] SAP -> VAN ({}sec)", endTime * 0.001);
+            log.info("[SUCCESS] SAP -> VAN -> SAP({}sec)", endTime * 0.001);
 
             return "S";
         } catch (IOException e) {
-            log.error("--SOCKET SEND FAILED: {}", e.getMessage());
+            log.error("SEND FAILED: {}", e.getMessage());
             return "F";
         } finally {
             disConnect();
@@ -135,7 +135,7 @@ public class SocketServiceImpl implements SocketService {
                 jCoFunction.getImportParameterList().setValue(properties.getProperty("jco.param.import0.krw"), value);
                 jCoFunction.execute(jCoDestination);
             } catch (JCoException e) {
-                log.error("Error setting KRW: {}", e.getMessage());
+                log.error("ERROR KRW: {}", e.getMessage());
             }
         } else {
             try {
@@ -144,7 +144,7 @@ public class SocketServiceImpl implements SocketService {
                 jCoFunction.getImportParameterList().setValue(properties.getProperty("jco.param.import0.keb"), value);
                 jCoFunction.execute(jCoDestination);
             } catch (JCoException e) {
-                log.error("Error setting KEB: {}", e.getMessage());
+                log.error("ERROR KEB: {}", e.getMessage());
             }
         }
     }
