@@ -63,7 +63,7 @@ public class SocketServiceImpl implements SocketService {
 
                 outputStream.write(toBytes);
                 outputStream.flush();
-            } else {
+            } else if (importParam1.equals("KEB")){
                 setKEBSocket();
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                 byte[] toBytes = truncateToBytes(importParam, 2000);
@@ -91,7 +91,7 @@ public class SocketServiceImpl implements SocketService {
             }
 
             log.info("--received DATA: [{}byte] [{}]", receivedMessage.length(), receivedMessage);
-            setSendToSap(receivedMessage, importParam1);
+            setSendToSap(receivedMessage, receivedMessage);
 
             long endTime = System.currentTimeMillis() - startTime;
             log.info("--[SOCKET SEND SUCCESS] SAP -> VAN ({}sec)", endTime * 0.001);
@@ -105,7 +105,7 @@ public class SocketServiceImpl implements SocketService {
         }
     }
 
-    private static byte[] truncateToBytes(String input, int len) throws UnsupportedEncodingException {
+    private byte[] truncateToBytes(String input, int len) throws UnsupportedEncodingException {
         byte[] utf8Bytes = input.getBytes("UTF-8");
 
         if (utf8Bytes.length <= len) {
@@ -128,7 +128,7 @@ public class SocketServiceImpl implements SocketService {
 
 
     private void setSendToSap(String value, String type) {
-        if (type.equals("KRW")) {
+        if (type.getBytes().length == 300) {
             try {
                 JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("jco.server.repository_destination"));
                 JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("jco.function.krw"));
