@@ -1,0 +1,31 @@
+#For test purposes only
+#Mon May 20 09:41:21 KST 2024
+socket.port=9238
+jco.client.user=FBS_RFC
+jco.client.lang=EN
+jco.param.export=IFRESULT
+jco.function.krw=ZBZW11F_LC_IN
+jco.function.keb=ZBZF11F_FC_IN
+jco.param.import0.krw=I_DATA
+jco.param.import0.keb=I_DATA
+jco.param.export.krw=IFRESULT
+jco.param.export.keb=IFRESULT
+jco.server.repository_destination=ZFIRMBANK
+jco.type=NORMAL
+jco.server.connection_count=1
+jco.client.sysnr=00
+jco.server.progid=ZFIRMBANK
+jco.client.client=500
+jco.param.import1=STYPE
+jco.param.import0=I_DATA
+jco.server.gwserv=3300
+jco.client.ashost=10.10.20.105
+jco.destination.peak_limit=10
+jco.server.gwhost=10.10.20.105
+jco.destination.pool_capacity=3
+jco.param.import1.krw=I_BUKRS
+jco.param.import1.keb=I_BUKRS
+socket.ip=129.200.9.18
+jco.client.passwd=fbs_rfc1
+jco.function.batch=ZBZW11F_BATCH_IN
+jco.function.bill=ZBZB11F_LB_IN
