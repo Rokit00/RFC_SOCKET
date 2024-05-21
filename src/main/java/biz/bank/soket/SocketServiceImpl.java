@@ -38,7 +38,7 @@ public class SocketServiceImpl implements SocketService {
     }
 
     @Override
-    public void disConnect() {
+    public void disconnect() {
         try {
             if (socket != null) {
                 socket.close();
@@ -121,12 +121,12 @@ public class SocketServiceImpl implements SocketService {
             log.error("SEND FAILED: {}", e.getMessage());
             return "F";
         } finally {
-            disConnect();
+            disconnect();
         }
     }
 
     private byte[] truncateToBytes(String input, int len) throws UnsupportedEncodingException {
-        byte[] bytes = input.getBytes("UTF-8");
+        byte[] bytes = input.getBytes("EUC-KR");
 
         if (bytes.length <= len) {
             return input.getBytes();
@@ -145,7 +145,6 @@ public class SocketServiceImpl implements SocketService {
 
         return truncatedBytes;
     }
-
 
     private void setSendToSap(String value, String type) {
         if (type.getBytes().length == 300) {

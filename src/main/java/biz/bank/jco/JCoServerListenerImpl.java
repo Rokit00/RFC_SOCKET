@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class JCoServerListenerImpl implements JCoServerErrorListener, JCoServerExceptionListener {
     private static final Logger log = LoggerFactory.getLogger(JCoServerListenerImpl.class);
+
     @Override
     public void serverErrorOccurred(JCoServer jcoServer, String connectionId, JCoServerContextInfo jCoServerContextInfo, Error error) {
         log.error("[SERVER ERROR OCCURRED] {}", error.getMessage());
