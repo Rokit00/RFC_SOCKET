@@ -53,7 +53,6 @@ public class SocketServiceImpl implements SocketService {
     public String logic(String importParam, String importParam1) {
         long startTime = System.currentTimeMillis();
         try {
-
             if (importParam1.equals("WON")) {
                 setKRWSocket();
                 DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
@@ -63,40 +62,61 @@ public class SocketServiceImpl implements SocketService {
 
                 outputStream.write(toBytes);
                 outputStream.flush();
-            } else if (importParam1.equals("KEB")){
+
+                log.info("DATA SENT TO VAN");
+
+                DataInputStream reader = new DataInputStream(socket.getInputStream());
+
+                byte[] receivedBytes = new byte[300];
+                reader.readFully(receivedBytes);
+                String receivedMessage = new String(receivedBytes, "EUC-KR");
+
+                if (receivedMessage.isEmpty()) {
+                    log.info("NO DATA RECEIVED FROM VAN");
+                    return "F";
+                }
+
+                log.info("DATA RECEIVED FROM VAN: [{}byte] [{}]", receivedBytes.length, receivedMessage);
+                setSendToSap(receivedMessage, receivedMessage);
+
+                long endTime = System.currentTimeMillis() - startTime;
+                log.info("[SUCCESS] SAP -> VAN -> SAP({}sec)", endTime * 0.001);
+
+                return "S";
+            } else if (importParam1.equals("KEB")) {
                 setKEBSocket();
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 byte[] toBytes = truncateToBytes(importParam, 2000);
                 log.info("DATA: [{}byte] [{}]", toBytes.length, importParam);
                 log.info("TYPE: {}", importParam1);
 
-                outputStream.write(toBytes);
-                outputStream.flush();
-            }
+                dataOutputStream.write(toBytes);
+                dataOutputStream.flush();
 
-            log.info("DATA SENT TO VAN");
+                log.info("DATA SENT TO VAN");
 
-            DataInputStream reader = new DataInputStream(socket.getInputStream());
+                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
-            StringBuilder messageBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                messageBuilder.append(line);
-            }
-            String receivedMessage = messageBuilder.toString();
+                byte[] receivedBytes = new byte[2000];
+                dataInputStream.readFully(receivedBytes);
+                String receivedMessage = new String(receivedBytes, "EUC-KR");
 
-            if (receivedMessage.isEmpty()) {
-                log.info("NO DATA RECEIVED FROM VAN");
+                if (receivedMessage.isEmpty()) {
+                    log.info("NO DATA RECEIVED FROM VAN");
+                    return "F";
+                }
+
+                log.info("DATA RECEIVED FROM VAN: [{}byte] [{}]", receivedBytes.length, receivedMessage);
+                setSendToSap(receivedMessage, receivedMessage);
+
+                long endTime = System.currentTimeMillis() - startTime;
+                log.info("[SUCCESS] SAP -> VAN -> SAP({}sec)", endTime * 0.001);
+
+                return "S";
+            } else {
+                log.info("TYPE IS NOT KRW OR KEB");
                 return "F";
             }
-
-            log.info("DATA RECEIVED FROM VAN: [{}byte] [{}]", receivedMessage.length(), receivedMessage);
-            setSendToSap(receivedMessage, receivedMessage);
-
-            long endTime = System.currentTimeMillis() - startTime;
-            log.info("[SUCCESS] SAP -> VAN -> SAP({}sec)", endTime * 0.001);
-
-            return "S";
         } catch (IOException e) {
             log.error("SEND FAILED: {}", e.getMessage());
             return "F";
@@ -106,22 +126,22 @@ public class SocketServiceImpl implements SocketService {
     }
 
     private byte[] truncateToBytes(String input, int len) throws UnsupportedEncodingException {
-        byte[] utf8Bytes = input.getBytes("UTF-8");
+        byte[] bytes = input.getBytes("UTF-8");
 
-        if (utf8Bytes.length <= len) {
+        if (bytes.length <= len) {
             return input.getBytes();
         }
 
         int truncatedLength = len;
         while (true) {
-            if ((utf8Bytes[truncatedLength] & 0xC0) != 0x80) {
+            if ((bytes[truncatedLength] & 0xC0) != 0x80) {
                 break;
             }
             truncatedLength--;
         }
 
         byte[] truncatedBytes = new byte[truncatedLength];
-        System.arraycopy(utf8Bytes, 0, truncatedBytes, 0, truncatedLength);
+        System.arraycopy(bytes, 0, truncatedBytes, 0, truncatedLength);
 
         return truncatedBytes;
     }
