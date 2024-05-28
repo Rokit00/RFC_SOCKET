@@ -1,8 +1,8 @@
-package biz.bank.jco;
+package suhun.kim.jco;
 
-import biz.bank.soket.SocketService;
-import biz.bank.soket.SocketServiceImpl;
-import biz.bank.util.PropertiesUtil;
+import suhun.kim.socket.SocketService;
+import suhun.kim.socket.SocketServiceImpl;
+import suhun.kim.util.PropertiesUtil;
 import com.sap.conn.jco.*;
 import com.sap.conn.jco.server.JCoServerContext;
 import com.sap.conn.jco.server.JCoServerFunctionHandler;
@@ -24,12 +24,12 @@ public class JCoServerFunctionHandlerImpl implements JCoServerFunctionHandler {
         JCoParameterList importParams = jCoFunction.getImportParameterList();
         JCoParameterList exportParams = jCoFunction.getExportParameterList();
 
-        String importParam0 = importParams.getString(properties.getProperty("jco.param.import0"));
-        String importParam1 = importParams.getString(properties.getProperty("jco.param.import1"));
+        String importParam0 = importParams.getString(properties.getProperty("JCO.PARAM.IMPORT0"));
+        String importParam1 = importParams.getString(properties.getProperty("JCO.PARAM.IMPORT1"));
 
         String result = socketService.logic(importParam0, importParam1);
 
-        exportParams.setValue(properties.getProperty("jco.param.export"), result);
+        exportParams.setValue(properties.getProperty("JCO.PARAM.EXPORT"), result);
 
         long resultTime = System.currentTimeMillis() - startTime;
         log.info("[END] RFC HANDLE REQUEST ({}sec) \r\n", resultTime * 0.001);

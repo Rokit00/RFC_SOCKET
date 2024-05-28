@@ -1,4 +1,4 @@
-package biz.bank.util;
+package suhun.kim.util;
 
 public interface Crypt {
     byte[] encrypt(String str);

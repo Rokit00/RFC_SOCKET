@@ -1,4 +1,4 @@
-package biz.bank.jco;
+package suhun.kim.jco;
 
 import com.sap.conn.jco.server.JCoServer;
 import com.sap.conn.jco.server.JCoServerContextInfo;
@@ -15,6 +15,7 @@ public class JCoServerListenerImpl implements JCoServerErrorListener, JCoServerE
         log.error("[SERVER ERROR OCCURRED] {}", error.getMessage());
         jcoServer.stop();
     }
+
     @Override
     public void serverExceptionOccurred(JCoServer jcoServer, String connectionId, JCoServerContextInfo jCoServerContextInfo, Exception exception) {
         log.error("[SERVER EXCEPTION OCCURRED] {}", exception.getMessage());

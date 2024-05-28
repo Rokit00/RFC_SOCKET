@@ -1,8 +1,11 @@
-package biz.bank.soket;
+package suhun.kim.socket;
 
 public interface SocketService {
-    void setKRWSocket();
-    void setKEBSocket();
+    void setSocket(String value);
+
     void disconnect();
+
     String logic(String importParam, String importParam1);
+
+    void setServerSocketByKRW();
 }

@@ -1,4 +1,4 @@
-package biz.bank.util;
+package suhun.kim.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,7 @@ public class PropertiesUtil {
             throw new RuntimeException(e);
         }
     }
+
     public static Properties getProperties() {
         return properties;
     }

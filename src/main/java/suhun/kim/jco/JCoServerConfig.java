@@ -1,6 +1,6 @@
-package biz.bank.jco;
+package suhun.kim.jco;
 
-import biz.bank.util.PropertiesUtil;
+import suhun.kim.util.PropertiesUtil;
 import com.sap.conn.jco.JCoException;
 import com.sap.conn.jco.ext.DestinationDataProvider;
 import com.sap.conn.jco.ext.ServerDataProvider;
@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Properties;
 
-public class JcoServerConfig {
-    private static final Logger log = LoggerFactory.getLogger(JcoServerConfig.class);
-    Properties properties = PropertiesUtil.getProperties();
+public class JCoServerConfig {
+    private static final Logger log = LoggerFactory.getLogger(JCoServerConfig.class);
+    private final Properties properties = PropertiesUtil.getProperties();
 
-    public JcoServerConfig() {
+    public JCoServerConfig() {
         long startTime = System.currentTimeMillis();
         if (properties.getProperty("jco.type").equals("MESSAGE")) {
             log.info("MESSAGE SERVER");
@@ -72,7 +72,7 @@ public class JcoServerConfig {
             jCoServer.start();
 
             long result = System.currentTimeMillis() - startTime;
-            log.info("[JCO CONFIG SUCCESS] {} ({}sec)\r\n", jCoServer.getProgramID(),result * 0.001);
+            log.info("[JCO CONFIG SUCCESS] {} ({}sec)\r\n", jCoServer.getProgramID(), result * 0.001);
         } catch (JCoException e) {
             log.info("JCO CONFIG ERROR: {}", e.getMessage());
         }
@@ -89,4 +89,3 @@ public class JcoServerConfig {
         }
     }
 }
-
