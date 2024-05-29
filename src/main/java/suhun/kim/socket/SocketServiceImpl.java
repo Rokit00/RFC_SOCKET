@@ -35,6 +35,9 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     socket = new Socket(properties.getProperty("SOCKET.IP"), Integer.parseInt(properties.getProperty("SOCKET.PORT.BILL")));
                     log.info("CONNECTED TO BILL SOCKET {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.BILL"));
                     break;
+                default:
+                    log.info("INCORRECT TYPE");
+                    break;
             }
         } catch (IOException e) {
             log.error("FAILED TO CONNECT SOCKET: {}", e.getMessage());
@@ -149,7 +152,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), receiveMessage);
                     jCoFunction1.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), receiveMessage);
                     jCoFunction.execute(jCoDestination);
-                    log.info("[RECEIVE KRW DATA] VAN -> DEMON [{}byte] [{}]", receiveMessage.getBytes().length, receiveMessage);
+                    log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}]", receiveMessage.getBytes().length, receiveMessage);
                 } catch (JCoException e) {
                     log.error("ERROR KRW SERVER SOCKET: {}", e.getMessage());
                 }
@@ -175,7 +178,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KEB"));
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KEB"), receiveMessage);
                     jCoFunction.execute(jCoDestination);
-                    log.info("[RECEIVE KEB DATA] VAN -> DEMON [{}byte] [{}]", receiveMessage.getBytes().length, receiveMessage);
+                    log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}]", receiveMessage.getBytes().length, receiveMessage);
                 } catch (JCoException e) {
                     log.error("ERROR KEB SERVER SOCKET: {}", e.getMessage());
                 }
@@ -208,7 +211,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
 
     private void setSendToSap(String value, String type) {
         switch (type) {
-            case "KRW":
+            case "WON":
                 try {
                     JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KRW"));
