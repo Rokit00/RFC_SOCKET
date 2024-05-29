@@ -18,52 +18,52 @@ public class JCoServerConfig {
 
     public JCoServerConfig() {
         long startTime = System.currentTimeMillis();
-        if (properties.getProperty("jco.type").equals("MESSAGE")) {
+        if (properties.getProperty("JCO.TYPE").equals("MESSAGE")) {
             log.info("MESSAGE SERVER");
-            properties.setProperty(DestinationDataProvider.JCO_MSHOST, properties.getProperty("jco.client.mshost"));
-            properties.setProperty(DestinationDataProvider.JCO_MSSERV, properties.getProperty("jco.client.msserv"));
-            properties.setProperty(DestinationDataProvider.JCO_R3NAME, properties.getProperty("jco.client.r3name"));
-            properties.setProperty(DestinationDataProvider.JCO_GROUP, properties.getProperty("jco.client.group"));
+            properties.setProperty(DestinationDataProvider.JCO_MSHOST, properties.getProperty("JCO.CLIENT.MSHOST"));
+            properties.setProperty(DestinationDataProvider.JCO_MSSERV, properties.getProperty("JCO.CLIENT.MSSERV"));
+            properties.setProperty(DestinationDataProvider.JCO_R3NAME, properties.getProperty("JCO.CLIENT.R3NAME"));
+            properties.setProperty(DestinationDataProvider.JCO_GROUP, properties.getProperty("JCO.CLIENT.GROUP"));
 
-            properties.setProperty(DestinationDataProvider.JCO_ASHOST, properties.getProperty("jco.client.ashost"));
-            properties.setProperty(DestinationDataProvider.JCO_SYSNR, properties.getProperty("jco.client.sysnr"));
-            properties.setProperty(DestinationDataProvider.JCO_CLIENT, properties.getProperty("jco.client.client"));
-            properties.setProperty(DestinationDataProvider.JCO_USER, properties.getProperty("jco.client.user"));
-            properties.setProperty(DestinationDataProvider.JCO_PASSWD, properties.getProperty("jco.client.passwd"));
-            properties.setProperty(DestinationDataProvider.JCO_LANG, properties.getProperty("jco.client.lang"));
-            properties.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, properties.getProperty("jco.destination.pool_capacity"));
-            properties.setProperty(DestinationDataProvider.JCO_PEAK_LIMIT, properties.getProperty("jco.destination.peak_limit"));
+            properties.setProperty(DestinationDataProvider.JCO_ASHOST, properties.getProperty("JCO.CLIENT.ASHOST"));
+            properties.setProperty(DestinationDataProvider.JCO_SYSNR, properties.getProperty("JCO.CLIENT.SYSNR"));
+            properties.setProperty(DestinationDataProvider.JCO_CLIENT, properties.getProperty("JCO.CLIENT.CLIENT"));
+            properties.setProperty(DestinationDataProvider.JCO_USER, properties.getProperty("JCO.CLIENT.USER"));
+            properties.setProperty(DestinationDataProvider.JCO_PASSWD, properties.getProperty("JCO.CLIENT.PASSWD"));
+            properties.setProperty(DestinationDataProvider.JCO_LANG, properties.getProperty("JCO.CLIENT.LANG"));
+            properties.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, properties.getProperty("JCO.DESTINATION.POOL_CAPACITY"));
+            properties.setProperty(DestinationDataProvider.JCO_PEAK_LIMIT, properties.getProperty("JCO.DESTINATION.PEAK_LIMIT"));
 
-            properties.setProperty(ServerDataProvider.JCO_GWHOST, properties.getProperty("jco.server.gwhost"));
-            properties.setProperty(ServerDataProvider.JCO_GWSERV, properties.getProperty("jco.server.gwserv"));
-            properties.setProperty(ServerDataProvider.JCO_PROGID, properties.getProperty("jco.server.progid"));
-            properties.setProperty(ServerDataProvider.JCO_CONNECTION_COUNT, properties.getProperty("jco.server.connection_count"));
-            properties.setProperty(ServerDataProvider.JCO_REP_DEST, properties.getProperty("jco.server.repository_destination"));
+            properties.setProperty(ServerDataProvider.JCO_GWHOST, properties.getProperty("JCO.SERVER.GWHOST"));
+            properties.setProperty(ServerDataProvider.JCO_GWSERV, properties.getProperty("JCO.SERVER.GWSERV"));
+            properties.setProperty(ServerDataProvider.JCO_PROGID, properties.getProperty("JCO.SERVER.PROGID"));
+            properties.setProperty(ServerDataProvider.JCO_CONNECTION_COUNT, properties.getProperty("JCO.SERVER.CONNECTION_COUNT"));
+            properties.setProperty(ServerDataProvider.JCO_REP_DEST, properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
 
-            createDataFile(properties.getProperty("jco.server.progid"), properties, ".JcoServer");
-            createDataFile(properties.getProperty("jco.server.repository_destination"), properties, ".JcoDestination");
+            createDataFile(properties.getProperty("JCO.SERVER.PROGID"), properties, ".JcoServer");
+            createDataFile(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"), properties, ".JcoDestination");
         } else {
-            properties.setProperty(DestinationDataProvider.JCO_ASHOST, properties.getProperty("jco.client.ashost"));
-            properties.setProperty(DestinationDataProvider.JCO_SYSNR, properties.getProperty("jco.client.sysnr"));
-            properties.setProperty(DestinationDataProvider.JCO_CLIENT, properties.getProperty("jco.client.client"));
-            properties.setProperty(DestinationDataProvider.JCO_USER, properties.getProperty("jco.client.user"));
-            properties.setProperty(DestinationDataProvider.JCO_PASSWD, properties.getProperty("jco.client.passwd"));
-            properties.setProperty(DestinationDataProvider.JCO_LANG, properties.getProperty("jco.client.lang"));
-            properties.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, properties.getProperty("jco.destination.pool_capacity"));
-            properties.setProperty(DestinationDataProvider.JCO_PEAK_LIMIT, properties.getProperty("jco.destination.peak_limit"));
+            properties.setProperty(DestinationDataProvider.JCO_ASHOST, properties.getProperty("JCO.CLIENT.ASHOST"));
+            properties.setProperty(DestinationDataProvider.JCO_SYSNR, properties.getProperty("JCO.CLIENT.SYSNR"));
+            properties.setProperty(DestinationDataProvider.JCO_CLIENT, properties.getProperty("JCO.CLIENT.CLIENT"));
+            properties.setProperty(DestinationDataProvider.JCO_USER, properties.getProperty("JCO.CLIENT.USER"));
+            properties.setProperty(DestinationDataProvider.JCO_PASSWD, properties.getProperty("JCO.CLIENT.PASSWD"));
+            properties.setProperty(DestinationDataProvider.JCO_LANG, properties.getProperty("JCO.CLIENT.LANG"));
+            properties.setProperty(DestinationDataProvider.JCO_POOL_CAPACITY, properties.getProperty("JCO.DESTINATION.POOL_CAPACITY"));
+            properties.setProperty(DestinationDataProvider.JCO_PEAK_LIMIT, properties.getProperty("JCO.DESTINATION.PEAK_LIMIT"));
 
-            properties.setProperty(ServerDataProvider.JCO_GWHOST, properties.getProperty("jco.server.gwhost"));
-            properties.setProperty(ServerDataProvider.JCO_GWSERV, properties.getProperty("jco.server.gwserv"));
-            properties.setProperty(ServerDataProvider.JCO_PROGID, properties.getProperty("jco.server.progid"));
-            properties.setProperty(ServerDataProvider.JCO_CONNECTION_COUNT, properties.getProperty("jco.server.connection_count"));
-            properties.setProperty(ServerDataProvider.JCO_REP_DEST, properties.getProperty("jco.server.repository_destination"));
+            properties.setProperty(ServerDataProvider.JCO_GWHOST, properties.getProperty("JCO.SERVER.GWHOST"));
+            properties.setProperty(ServerDataProvider.JCO_GWSERV, properties.getProperty("JCO.SERVER.GWSERV"));
+            properties.setProperty(ServerDataProvider.JCO_PROGID, properties.getProperty("JCO.SERVER.PROGID"));
+            properties.setProperty(ServerDataProvider.JCO_CONNECTION_COUNT, properties.getProperty("JCO.SERVER.CONNECTION_COUNT"));
+            properties.setProperty(ServerDataProvider.JCO_REP_DEST, properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
 
-            createDataFile(properties.getProperty("jco.server.progid"), properties, ".JcoServer");
-            createDataFile(properties.getProperty("jco.server.repository_destination"), properties, ".JcoDestination");
+            createDataFile(properties.getProperty("JCO.SERVER.PROGID"), properties, ".JcoServer");
+            createDataFile(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"), properties, ".JcoDestination");
         }
 
         try {
-            JCoServer jCoServer = JCoServerFactory.getServer(properties.getProperty("jco.server.progid"));
+            JCoServer jCoServer = JCoServerFactory.getServer(properties.getProperty("JCO.SERVER.PROGID"));
             jCoServer.setCallHandlerFactory(new JCoServerFunctionHandlerFactoryImpl());
             jCoServer.addServerExceptionListener(new JCoServerListenerImpl());
             jCoServer.addServerErrorListener(new JCoServerListenerImpl());

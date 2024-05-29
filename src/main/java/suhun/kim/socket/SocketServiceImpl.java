@@ -57,96 +57,71 @@ public class SocketServiceImpl extends Thread implements SocketService {
     public String logic(String importParam, String importParam1) {
         long startTime = System.currentTimeMillis();
         try {
-            if (importParam1.equals("WON")) {
-                setSocket(importParam1);
-                DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                byte[] toBytes = truncateToBytes(importParam, 300);
-                log.info("REQUEST: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
+            switch (importParam1) {
+                case "WON":
+                case "BILL": {
+                    setSocket(importParam1);
+                    DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+                    byte[] toBytes = truncateToBytes(importParam, 300);
+                    log.info("SAP -> DEMON: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
 
-                outputStream.write(toBytes);
-                outputStream.flush();
+                    outputStream.write(toBytes);
+                    outputStream.flush();
 
-                log.info("[SUCCESS] DEMON -> VAN");
+                    log.info("[SUCCESS] DEMON -> VAN");
 
-                DataInputStream reader = new DataInputStream(socket.getInputStream());
+                    DataInputStream reader = new DataInputStream(socket.getInputStream());
 
-                byte[] receivedBytes = new byte[300];
-                reader.readFully(receivedBytes);
-                String receivedMessage = new String(receivedBytes, "EUC-KR");
+                    byte[] receivedBytes = new byte[300];
+                    reader.readFully(receivedBytes);
+                    String receivedMessage = new String(receivedBytes, "EUC-KR");
 
-                if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                    log.info("NO DATA RECEIVED FROM VAN");
-                    return "F";
+                    if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
+                        log.info("NO DATA RECEIVED FROM VAN");
+                        return "F";
+                    }
+
+                    log.info("VAN -> DEMON: [{}] [{}byte] [{}]",importParam1, receivedBytes.length, receivedMessage);
+                    setSendToSap(receivedMessage, importParam1);
+
+                    long endTime = System.currentTimeMillis() - startTime;
+                    log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
+
+                    return "S";
                 }
+                case "KEB": {
+                    setSocket(importParam1);
+                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    byte[] toBytes = truncateToBytes(importParam, 2000);
+                    log.info("SAP -> DEMON: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
 
-                log.info("RESPONSE: VAN -> DEMON: [{}byte] [{}]", receivedBytes.length, receivedMessage);
-                setSendToSap(receivedMessage, importParam1);
+                    dataOutputStream.write(toBytes);
+                    dataOutputStream.flush();
 
-                long endTime = System.currentTimeMillis() - startTime;
-                log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
+                    log.info("[SUCCESS] DEMON -> VAN");
 
-                return "S";
-            } else if (importParam1.equals("KEB")) {
-                setSocket(importParam1);
-                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                byte[] toBytes = truncateToBytes(importParam, 2000);
-                log.info("REQUEST: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
+                    DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
-                dataOutputStream.write(toBytes);
-                dataOutputStream.flush();
+                    byte[] receivedBytes = new byte[2000];
+                    dataInputStream.readFully(receivedBytes);
+                    String receivedMessage = new String(receivedBytes, "EUC-KR");
 
-                log.info("[SUCCESS] DEMON -> VAN");
+                    if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
+                        log.info("NO DATA RECEIVED FROM VAN");
+                        return "F";
+                    }
 
-                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+                    log.info("VAN -> DEMON: [{}] [{}byte] [{}]",importParam1, receivedBytes.length, receivedMessage);
+                    setSendToSap(receivedMessage, importParam1);
 
-                byte[] receivedBytes = new byte[2000];
-                dataInputStream.readFully(receivedBytes);
-                String receivedMessage = new String(receivedBytes, "EUC-KR");
+                    long endTime = System.currentTimeMillis() - startTime;
+                    log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
 
-                if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                    log.info("NO DATA RECEIVED FROM VAN");
-                    return "F";
+                    return "S";
                 }
-
-                log.info("RESPONSE: VAN -> DEMON: [{}byte] [{}]", receivedBytes.length, receivedMessage);
-                setSendToSap(receivedMessage, importParam1);
-
-                long endTime = System.currentTimeMillis() - startTime;
-                log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
-
-                return "S";
-            } else if (importParam1.equals("BILL")) {
-                setSocket(importParam1);
-                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                byte[] toBytes = truncateToBytes(importParam, 300);
-                log.info("BILL REQUEST: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
-
-                dataOutputStream.write(toBytes);
-                dataOutputStream.flush();
-
-                log.info("[SUCCESS] DEMON -> VAN");
-
-                DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-
-                byte[] receivedBytes = new byte[300];
-                dataInputStream.readFully(receivedBytes);
-                String receivedMessage = new String(receivedBytes, "EUC-KR");
-
-                if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                    log.info("NO DATA RECEIVED FROM VAN");
+                default:
+                    log.info("INCORRECT STRING TYPE");
                     return "F";
-                }
-
-                log.info("RESPONSE VAN -> DEMON: [{}byte] [{}]", receivedBytes.length, receivedMessage);
-                setSendToSap(receivedMessage, importParam1);
-
-                long endTime = System.currentTimeMillis() - startTime;
-                log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
-
-                return "S";
-            } else {
-                log.info("INCORRECT TYPE(ex.KEB or BILL)");
-                return "F";
             }
         } catch (IOException e) {
             log.error("DATA VALUE: {}", e.getMessage());
