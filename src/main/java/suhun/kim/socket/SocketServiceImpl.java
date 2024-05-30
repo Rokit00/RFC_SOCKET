@@ -1,5 +1,6 @@
 package suhun.kim.socket;
 
+import suhun.kim.util.APIUtil;
 import suhun.kim.util.Crypt;
 import suhun.kim.util.PropertiesUtil;
 import com.sap.conn.jco.*;
@@ -9,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Properties;
+import java.util.Timer;
 
 
 public class SocketServiceImpl extends Thread implements SocketService {
@@ -17,6 +21,13 @@ public class SocketServiceImpl extends Thread implements SocketService {
     private static final Properties properties = PropertiesUtil.getProperties();
     private final Crypt crypt = null;
     private Socket socket;
+
+    public SocketServiceImpl() {
+        LocalDateTime dateTime = LocalDateTime.of(2024, Month.JUNE, 1, 10, 0);
+
+        Timer timer = new Timer();
+        timer.schedule(new APIUtil(), java.sql.Timestamp.valueOf(dateTime));
+    }
 
     @Override
     public void setSocket(String value) {
