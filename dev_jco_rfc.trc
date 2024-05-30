@@ -148,3 +148,93 @@ java.lang.NullPointerException
 	at com.sap.conn.jco.rt.DefaultServerWorker.run(DefaultServerWorker.java:232)
 	at java.lang.Thread.run(Thread.java:748)
 
+
+**** Error file opened at 20240530 143913 Korea Standard Time Rel 3.0.11 (2014-04-15) [721.713]
+Error:  >Thu May 30 14:39:13,995<    RfcException:
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=ZFIRMBANK ASHOST=10.10.20.105 SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       partner '10.10.20.105:3300' not reached
+TIME        Thu May 30 14:39:13 2024
+RELEASE     721
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -10
+MODULE      nixxi.cpp
+LINE        3283
+DETAIL      NiPConnect2: 10.10.20.105:3300
+SYSTEM CALL connect
+ERRNO       10060
+ERRNO TEXT  WSAETIMEDOUT: Connection timed out
+COUNTER     2
+
+    return code: RFC_FAILURE (1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+Error:  >Thu May 30 14:39:35,163<    RfcException:
+    message: Connect to SAP gateway failed
+    Connection parameters: TPNAME=ZFIRMBANK GWHOST=10.10.20.105 GWSERV=3300
+
+ERROR       partner '10.10.20.105:3300' not reached
+TIME        Thu May 30 14:39:35 2024
+RELEASE     721
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -10
+MODULE      nixxi.cpp
+LINE        3283
+DETAIL      NiPConnect2: 10.10.20.105:3300
+SYSTEM CALL connect
+ERRNO       10060
+ERRNO TEXT  WSAETIMEDOUT: Connection timed out
+COUNTER     1
+
+    return code: RFC_FAILURE (1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+
+**** Error file opened at 20240530 145200 Korea Standard Time Rel 3.0.11 (2014-04-15) [721.713]
+Error:  >Thu May 30 14:52:00,060<    RfcException:
+    message: Connect to SAP gateway failed
+Connection parameters: TYPE=A DEST=ZFIRMBANK ASHOST=10.10.20.105 SYSNR=00 PCS=1
+
+LOCATION    CPIC (TCP/IP) on local host with Unicode
+ERROR       partner '10.10.20.105:3300' not reached
+TIME        Thu May 30 14:52:00 2024
+RELEASE     721
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -10
+MODULE      nixxi.cpp
+LINE        3283
+DETAIL      NiPConnect2: 10.10.20.105:3300
+SYSTEM CALL connect
+ERRNO       10060
+ERRNO TEXT  WSAETIMEDOUT: Connection timed out
+COUNTER     2
+
+    return code: RFC_FAILURE (1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION
+Error:  >Thu May 30 14:52:21,184<    RfcException:
+    message: Connect to SAP gateway failed
+    Connection parameters: TPNAME=ZFIRMBANK GWHOST=10.10.20.105 GWSERV=3300
+
+ERROR       partner '10.10.20.105:3300' not reached
+TIME        Thu May 30 14:52:21 2024
+RELEASE     721
+COMPONENT   NI (network interface)
+VERSION     40
+RC          -10
+MODULE      nixxi.cpp
+LINE        3283
+DETAIL      NiPConnect2: 10.10.20.105:3300
+SYSTEM CALL connect
+ERRNO       10060
+ERRNO TEXT  WSAETIMEDOUT: Connection timed out
+COUNTER     1
+
+    return code: RFC_FAILURE (1)
+    error group: 102
+    key: RFC_ERROR_COMMUNICATION

@@ -2,7 +2,6 @@ package suhun.kim.socket;
 
 import suhun.kim.util.Crypt;
 import suhun.kim.util.PropertiesUtil;
-import suhun.kim.util.TripleDESImpl;
 import com.sap.conn.jco.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +20,20 @@ public class SocketServiceImpl extends Thread implements SocketService {
 
     @Override
     public void setSocket(String value) {
+        long startTime = System.currentTimeMillis();
         try {
             switch (value) {
                 case "WON":
                     socket = new Socket(properties.getProperty("SOCKET.IP"), Integer.parseInt(properties.getProperty("SOCKET.PORT.KRW")));
-                    log.info("CONNECTED TO KRW SOCKET {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KRW"));
+                    log.info("CONNECTED TO KRW SOCKET {}:{} ({}sec)", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KRW"), (System.currentTimeMillis() - startTime) * 0.001);
                     break;
                 case "KEB":
                     socket = new Socket(properties.getProperty("SOCKET.IP"), Integer.parseInt(properties.getProperty("SOCKET.PORT.KEB")));
-                    log.info("CONNECTED TO KEB SOCKET {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KEB"));
+                    log.info("CONNECTED TO KEB SOCKET {}:{} ({}sec)", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.KEB"), (System.currentTimeMillis() - startTime) * 0.001);
                     break;
                 case "BILL":
                     socket = new Socket(properties.getProperty("SOCKET.IP"), Integer.parseInt(properties.getProperty("SOCKET.PORT.BILL")));
-                    log.info("CONNECTED TO BILL SOCKET {}:{}", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.BILL"));
+                    log.info("CONNECTED TO BILL SOCKET {}:{} ({}sec)", properties.getProperty("SOCKET.IP"), properties.getProperty("SOCKET.PORT.BILL"), (System.currentTimeMillis() - startTime) * 0.001);
                     break;
                 default:
                     log.info("INCORRECT TYPE");
@@ -49,7 +49,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
         try {
             if (socket != null) {
                 socket.close();
-                log.info("DISCONNECTED TO VAN");
+                log.debug("DISCONNECTED TO VAN");
             }
         } catch (IOException e) {
             log.error("FAILED TO DISCONNECT FROM VAN: {}", e.getMessage());
@@ -66,12 +66,12 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     setSocket(importParam1);
                     DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
                     byte[] toBytes = truncateToBytes(importParam, 300);
-                    log.info("SAP -> DEMON: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
 
                     outputStream.write(toBytes);
                     outputStream.flush();
 
-                    log.info("[SUCCESS] DEMON -> VAN");
+                    log.info("[RFC] SAP -> DEMON: [{}] [{}byte] [{}] ({}sec)\r\n", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
+                    log.debug("[SUCCESS] DEMON -> VAN");
 
                     DataInputStream reader = new DataInputStream(socket.getInputStream());
 
@@ -80,15 +80,15 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     String receivedMessage = new String(receivedBytes, "EUC-KR");
 
                     if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                        log.info("NO DATA RECEIVED FROM VAN");
+                        log.info("NO DATA RECEIVED FROM VAN\r\n");
                         return "F";
                     }
 
-                    log.info("VAN -> DEMON: [{}] [{}byte] [{}]",importParam1, receivedBytes.length, receivedMessage);
+                    log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]\r\n",importParam1, receivedBytes.length, receivedMessage);
                     setSendToSap(receivedMessage, importParam1);
 
                     long endTime = System.currentTimeMillis() - startTime;
-                    log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
+                    log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
 
                     return "S";
                 }
@@ -96,12 +96,12 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     setSocket(importParam1);
                     DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                     byte[] toBytes = truncateToBytes(importParam, 2000);
-                    log.info("SAP -> DEMON: [{}] [{}byte] [{}]", importParam1, toBytes.length, importParam);
 
                     dataOutputStream.write(toBytes);
                     dataOutputStream.flush();
 
-                    log.info("[SUCCESS] DEMON -> VAN");
+                    log.info("[RFC] SAP -> DEMON: [{}] [{}byte] [{}] ({}sec)\r\n", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
+                    log.debug("[SUCCESS] DEMON -> VAN");
 
                     DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
@@ -110,15 +110,15 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     String receivedMessage = new String(receivedBytes, "EUC-KR");
 
                     if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                        log.info("NO DATA RECEIVED FROM VAN");
+                        log.info("NO DATA RECEIVED FROM VAN\r\n");
                         return "F";
                     }
 
-                    log.info("VAN -> DEMON: [{}] [{}byte] [{}]",importParam1, receivedBytes.length, receivedMessage);
+                    log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]\r\n",importParam1, receivedBytes.length, receivedMessage);
                     setSendToSap(receivedMessage, importParam1);
 
                     long endTime = System.currentTimeMillis() - startTime;
-                    log.info("[SUCCESS] DEMON -> SAP ({}sec)", endTime * 0.001);
+                    log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
 
                     return "S";
                 }
@@ -141,6 +141,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
             while (true) {
                 socket = serverSocket.accept();
 
+                long startTime = System.currentTimeMillis();
                 byte[] bytes = new byte[300];
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 dataInputStream.readFully(bytes);
@@ -152,7 +153,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), receiveMessage);
                     jCoFunction1.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), receiveMessage);
                     jCoFunction.execute(jCoDestination);
-                    log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}]", receiveMessage.getBytes().length, receiveMessage);
+                    log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
                     log.error("ERROR KRW SERVER SOCKET: {}", e.getMessage());
                 }
@@ -169,6 +170,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
             while (true) {
                 socket = serverSocket.accept();
 
+                long startTime = System.currentTimeMillis();
                 byte[] bytes = new byte[2000];
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 dataInputStream.readFully(bytes);
@@ -178,7 +180,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KEB"));
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KEB"), receiveMessage);
                     jCoFunction.execute(jCoDestination);
-                    log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}]", receiveMessage.getBytes().length, receiveMessage);
+                    log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
                     log.error("ERROR KEB SERVER SOCKET: {}", e.getMessage());
                 }
@@ -210,6 +212,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
     }
 
     private void setSendToSap(String value, String type) {
+        long startTime = System.currentTimeMillis();
         switch (type) {
             case "WON":
                 try {
@@ -217,6 +220,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KRW"));
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), value);
                     jCoFunction.execute(jCoDestination);
+                    log.info("[RFC] DEMON(WON) -> SAP ({}sec)", (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
                     log.error("DEMON(KRW) -> SAP: {}", e.getMessage());
                 }
@@ -227,6 +231,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KEB"));
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KEB"), value);
                     jCoFunction.execute(jCoDestination);
+                    log.info("[RFC] DEMON(KEB) -> SAP ({}sec)", (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
                     log.error("DEMON(KEB)-> SAP: {}", e.getMessage());
                 }
@@ -237,6 +242,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.BILL"));
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), value);
                     jCoFunction.execute(jCoDestination);
+                    log.info("[RFC] DEMON(BILL) -> SAP ({}sec)", (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
                     log.error("DEMON(BILL)-> SAP: {}", e.getMessage());
                 }

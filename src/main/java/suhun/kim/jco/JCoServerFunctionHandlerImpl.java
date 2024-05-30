@@ -19,7 +19,7 @@ public class JCoServerFunctionHandlerImpl implements JCoServerFunctionHandler {
     @Override
     public void handleRequest(JCoServerContext jCoServerContext, JCoFunction jCoFunction) throws AbapException, AbapClassException {
         long startTime = System.currentTimeMillis();
-        log.info("[START] RFC HANDLE REQUEST");
+        log.debug("[START] RFC HANDLE REQUEST");
 
         JCoParameterList importParams = jCoFunction.getImportParameterList();
         JCoParameterList exportParams = jCoFunction.getExportParameterList();
@@ -32,6 +32,6 @@ public class JCoServerFunctionHandlerImpl implements JCoServerFunctionHandler {
         exportParams.setValue(properties.getProperty("JCO.PARAM.EXPORT"), result);
 
         long resultTime = System.currentTimeMillis() - startTime;
-        log.info("[END] RFC HANDLE REQUEST ({}sec) \r\n", resultTime * 0.001);
+        log.debug("[END] RFC HANDLE REQUEST ({}sec) \r\n", resultTime * 0.001);
     }
 }

@@ -19,7 +19,7 @@ public class JCoServerConfig {
     public JCoServerConfig() {
         long startTime = System.currentTimeMillis();
         if (properties.getProperty("JCO.TYPE").equals("MESSAGE")) {
-            log.info("MESSAGE SERVER");
+            log.debug("MESSAGE SERVER");
             properties.setProperty(DestinationDataProvider.JCO_MSHOST, properties.getProperty("JCO.CLIENT.MSHOST"));
             properties.setProperty(DestinationDataProvider.JCO_MSSERV, properties.getProperty("JCO.CLIENT.MSSERV"));
             properties.setProperty(DestinationDataProvider.JCO_R3NAME, properties.getProperty("JCO.CLIENT.R3NAME"));
@@ -72,9 +72,9 @@ public class JCoServerConfig {
             jCoServer.start();
 
             long result = System.currentTimeMillis() - startTime;
-            log.info("[JCO CONFIG SUCCESS] {} ({}sec)\r\n", jCoServer.getProgramID(), result * 0.001);
+            log.debug("[JCO CONFIG SUCCESS] {} ({}sec)\r\n", jCoServer.getProgramID(), result * 0.001);
         } catch (JCoException e) {
-            log.info("JCO CONFIG ERROR: {}", e.getMessage());
+            log.error("JCO CONFIG ERROR: {}", e.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public class JCoServerConfig {
             properties.store(fileOutputStream, "For test purposes only");
             fileOutputStream.close();
         } catch (IOException e) {
-            log.info("JCO CREATE DATA FILES ERROR: {}", e.getMessage());
+            log.error("JCO CREATE DATA FILES ERROR: {}", e.getMessage());
         }
     }
 }

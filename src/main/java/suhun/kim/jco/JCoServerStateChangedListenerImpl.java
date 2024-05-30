@@ -14,6 +14,6 @@ public class JCoServerStateChangedListenerImpl implements JCoServerStateChangedL
     @Override
     public void serverStateChangeOccurred(JCoServer jCoServer, JCoServerState jCoServerState, JCoServerState newState) {
         logAPIUtil.send(newState.name());
-        log.info("JCO SERVER STATE: [{}] [{}]\r\n", newState.name(), jCoServer.getProgramID());
+        log.debug("JCO SERVER STATE: [{}] [{}]\r\n", newState.name(), jCoServer.getProgramID());
     }
 }
