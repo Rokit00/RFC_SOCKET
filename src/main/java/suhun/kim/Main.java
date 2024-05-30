@@ -9,7 +9,9 @@ public class Main {
         new JCoServerConfig();
         Thread thread = new SocketServiceImpl();
         thread.start();
+        System.out.println("a");
         SocketService socketService = new SocketServiceImpl();
         socketService.setServerSocketByKRW();
+        System.out.println("b");
     }
 }

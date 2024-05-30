@@ -23,7 +23,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
     private Socket socket;
 
     public SocketServiceImpl() {
-        LocalDateTime dateTime = LocalDateTime.of(2024, Month.JUNE, 1, 10, 0);
+        LocalDateTime dateTime = LocalDateTime.of(2024, Month.MAY, 30, 17, 47);
 
         Timer timer = new Timer();
         timer.schedule(new APIUtil(), java.sql.Timestamp.valueOf(dateTime));
