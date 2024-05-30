@@ -6,17 +6,18 @@ import suhun.kim.socket.SocketServiceImpl;
 import suhun.kim.util.APIUtil;
 
 import java.time.LocalDateTime;
+import java.util.Timer;
 
 public class Main {
     public static void main(String[] args) {
         new JCoServerConfig();
-        LocalDateTime targetDateTime = LocalDateTime.of(2024, 5, 30, 18, 14, 0);
-        System.out.println(LocalDateTime.now());
-        System.out.println(targetDateTime);
         Thread thread = new SocketServiceImpl();
         thread.start();
-        Thread a = new APIUtil();
-        a.start();
+
+        Timer timer = new Timer();
+        LocalDateTime targetDateTime = LocalDateTime.now().plusSeconds(5);
+        timer.schedule(new APIUtil(), java.sql.Timestamp.valueOf(targetDateTime));
+
         System.out.println("a");
         SocketService socketService = new SocketServiceImpl();
         socketService.setServerSocketByKRW();
