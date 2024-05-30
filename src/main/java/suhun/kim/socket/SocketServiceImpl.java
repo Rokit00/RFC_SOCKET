@@ -11,27 +11,13 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.Properties;
-import java.util.Timer;
-
 
 public class SocketServiceImpl extends Thread implements SocketService {
     private static final Logger log = LoggerFactory.getLogger(SocketServiceImpl.class);
     private static final Properties properties = PropertiesUtil.getProperties();
     private final Crypt crypt = null;
     private Socket socket;
-
-    public SocketServiceImpl() {
-        LocalDateTime targetDateTime = LocalDateTime.of(2024, 5, 30, 17, 59, 0);
-
-        if (LocalDateTime.now().isEqual(targetDateTime)) {
-            System.out.println("POKOKO");
-
-            APIUtil apiUtil = new APIUtil();
-
-        }
-    }
 
     @Override
     public void setSocket(String value) {
