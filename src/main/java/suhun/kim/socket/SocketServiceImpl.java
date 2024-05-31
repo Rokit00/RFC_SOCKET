@@ -116,12 +116,13 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 dataInputStream.readFully(bytes);
                 String receiveMessage = new String(bytes, "EUC-KR");
                 if (receiveMessage.contains("6000200") || receiveMessage.contains("4000500") || receiveMessage.contains("4000501")) {
+                    log.info("[RECEIVED BILL DATA] VAN -> DEMON [{}byte] [{}] ({}sec)", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                     try {
                         JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
                         JCoFunction jCoFunctionBILL = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.BILL"));
                         jCoFunctionBILL.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), receiveMessage);
                         jCoFunctionBILL.execute(jCoDestination);
-                        log.info("[RECEIVED BILL DATA] VAN -> DEMON [{}byte] [{}] ({}sec)", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                        log.info("[RECEIVE BILL DATA] DEMON -> SAP [{}]", jCoFunctionBILL.getName());
 
                         StringBuilder stringBuilder = new StringBuilder(receiveMessage);
                         stringBuilder.setCharAt(24, '1');
@@ -132,13 +133,16 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     } catch (JCoException e) {
                         log.error("ERROR BILL SERVER SOCKET: {}", e.getMessage());
                     }
+                } else if (receiveMessage.isEmpty() || receiveMessage.equals("null")) {
+                    log.info("RECEIVED DATA IS NULL");
                 } else {
+                    log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}] ({}sec)", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                     try {
                         JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
                         JCoFunction jCoFunctionKRW = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KRW"));
                         jCoFunctionKRW.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), receiveMessage);
                         jCoFunctionKRW.execute(jCoDestination);
-                        log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}] ({}sec)", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                        log.info("[RECEIVE KRW DATA] DEMON -> SAP [{}]", jCoFunctionKRW.getName());
 
                         StringBuilder stringBuilder = new StringBuilder(receiveMessage);
                         stringBuilder.setCharAt(21, '1');
@@ -169,12 +173,13 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 dataInputStream.readFully(bytes);
                 String receiveMessage = new String(bytes, "EUC-KR");
+                log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                 try {
                     JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KEB"));
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KEB"), receiveMessage);
                     jCoFunction.execute(jCoDestination);
-                    log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                    log.info("[RECEIVE KEB DATA] DEMON -> SAP [{}]", jCoFunction.getName());
 
                     StringBuilder stringBuilder = new StringBuilder(receiveMessage);
                     stringBuilder.setCharAt(24, '1');
@@ -234,7 +239,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     jCoFunction.execute(jCoDestination);
                     log.info("[RFC] DEMON(KEB) -> SAP ({}sec)\r\n", (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
-                    log.error("DEMON(KEB)-> SAP: {}", e.getMessage());
+                    log.error("DEMON(KEB) -> SAP: {}", e.getMessage());
                 }
                 break;
             case "BILL":
@@ -245,7 +250,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     jCoFunction.execute(jCoDestination);
                     log.info("[RFC] DEMON(BILL) -> SAP ({}sec)\r\n", (System.currentTimeMillis() - startTime) * 0.001);
                 } catch (JCoException e) {
-                    log.error("DEMON(BILL)-> SAP: {}", e.getMessage());
+                    log.error("DEMON(BILL) -> SAP: {}", e.getMessage());
                 }
                 break;
         }

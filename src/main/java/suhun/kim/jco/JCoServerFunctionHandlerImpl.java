@@ -26,6 +26,7 @@ public class JCoServerFunctionHandlerImpl implements JCoServerFunctionHandler {
 
         String importParam0 = importParams.getString(properties.getProperty("JCO.PARAM.IMPORT0"));
         String importParam1 = importParams.getString(properties.getProperty("JCO.PARAM.IMPORT1"));
+        log.info("[RFC] SAP -> DEMON: [{}][{}]", importParam0, importParam1);
 
         String result = socketService.logic(importParam0, importParam1);
 
