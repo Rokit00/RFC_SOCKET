@@ -61,72 +61,43 @@ public class SocketServiceImpl extends Thread implements SocketService {
     public String logic(String importParam, String importParam1) {
         long startTime = System.currentTimeMillis();
         try {
+
+            setSocket(importParam1);
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            byte[] toBytes = truncateToBytes(importParam, 300);
+
+            outputStream.write(toBytes);
+            outputStream.flush();
+
+            log.info("[RFC] SAP -> DEMON: [{}] [{}byte] [{}] ({}sec)\r\n", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
+            log.debug("[SUCCESS] DEMON -> VAN");
+
+            DataInputStream reader = new DataInputStream(socket.getInputStream());
+
+            byte[] receivedBytes = new byte[0];
             switch (importParam1) {
                 case "WON":
-                case "BILL": {
-                    setSocket(importParam1);
-                    DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-                    byte[] toBytes = truncateToBytes(importParam, 300);
-
-                    outputStream.write(toBytes);
-                    outputStream.flush();
-
-                    log.info("[RFC] SAP -> DEMON: [{}] [{}byte] [{}] ({}sec)\r\n", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
-                    log.debug("[SUCCESS] DEMON -> VAN");
-
-                    DataInputStream reader = new DataInputStream(socket.getInputStream());
-
-                    byte[] receivedBytes = new byte[300];
-                    reader.readFully(receivedBytes);
-                    String receivedMessage = new String(receivedBytes, "EUC-KR");
-
-                    if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                        log.info("NO DATA RECEIVED FROM VAN\r\n");
-                        return "F";
-                    }
-
-                    log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]\r\n",importParam1, receivedBytes.length, receivedMessage);
-                    setSendToSap(receivedMessage, importParam1);
-
-                    long endTime = System.currentTimeMillis() - startTime;
-                    log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
-
-                    return "S";
-                }
-                case "KEB": {
-                    setSocket(importParam1);
-                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    byte[] toBytes = truncateToBytes(importParam, 2000);
-
-                    dataOutputStream.write(toBytes);
-                    dataOutputStream.flush();
-
-                    log.info("[RFC] SAP -> DEMON: [{}] [{}byte] [{}] ({}sec)\r\n", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
-                    log.debug("[SUCCESS] DEMON -> VAN");
-
-                    DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-
-                    byte[] receivedBytes = new byte[2000];
-                    dataInputStream.readFully(receivedBytes);
-                    String receivedMessage = new String(receivedBytes, "EUC-KR");
-
-                    if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                        log.info("NO DATA RECEIVED FROM VAN\r\n");
-                        return "F";
-                    }
-
-                    log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]\r\n",importParam1, receivedBytes.length, receivedMessage);
-                    setSendToSap(receivedMessage, importParam1);
-
-                    long endTime = System.currentTimeMillis() - startTime;
-                    log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
-
-                    return "S";
-                }
-                default:
-                    log.info("INCORRECT STRING TYPE");
-                    return "F";
+                case "BILL":
+                    receivedBytes = new byte[300];
+                    break;
+                case "KEB":
+                    receivedBytes = new byte[2000];
+                    break;
             }
+            reader.readFully(receivedBytes);
+            String receivedMessage = new String(receivedBytes, "EUC-KR");
+
+            if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
+                log.info("NO DATA RECEIVED FROM VAN\r\n");
+                return "F";
+            }
+
+            log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]\r\n", importParam1, receivedBytes.length, receivedMessage);
+            setSendToSap(receivedMessage, importParam1);
+
+            long endTime = System.currentTimeMillis() - startTime;
+            log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
+            return "S";
         } catch (IOException e) {
             log.error("DATA VALUE: {}", e.getMessage());
             return "F";
@@ -147,22 +118,33 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 dataInputStream.readFully(bytes);
                 String receiveMessage = new String(bytes, "EUC-KR");
-                try {
-                    JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
-                    JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KRW"));
-                    JCoFunction jCoFunction1 = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.BILL"));
-                    jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), receiveMessage);
-                    jCoFunction1.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), receiveMessage);
-                    jCoFunction.execute(jCoDestination);
-                    log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
-                } catch (JCoException e) {
-                    log.error("ERROR KRW SERVER SOCKET: {}", e.getMessage());
+                if (receiveMessage.contains("6000200") || receiveMessage.contains("4000500") || receiveMessage.contains("4000501")) {
+                    try {
+                        JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
+                        JCoFunction jCoFunctionBILL = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.BILL"));
+                        jCoFunctionBILL.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), receiveMessage);
+                        jCoFunctionBILL.execute(jCoDestination);
+                        log.info("[RECEIVED BILL DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                    } catch (JCoException e) {
+                        log.error("ERROR BILL SERVER SOCKET: {}", e.getMessage());
+                    }
+                } else {
+                    try {
+                        JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
+                        JCoFunction jCoFunctionKRW = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KRW"));
+                        jCoFunctionKRW.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), receiveMessage);
+                        jCoFunctionKRW.execute(jCoDestination);
+                        log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                    } catch (JCoException e) {
+                        log.error("ERROR KRW SERVER SOCKET: {}", e.getMessage());
+                    }
                 }
             }
         } catch (IOException e) {
-            log.error("RECEIVED KRW DATA VALUE [{}]", e.getMessage());
+            log.error("RECEIVED DATA VALUE [{}]", e.getMessage());
         }
     }
+
 
     @Override
     public void run() {
