@@ -13,14 +13,10 @@ public class Main {
         new JCoServerConfig();
         Thread thread = new SocketServiceImpl();
         thread.start();
-
-        Timer timer = new Timer();
-        LocalDateTime targetDateTime = LocalDateTime.now().plusSeconds(5);
-        timer.schedule(new APIUtil(), java.sql.Timestamp.valueOf(targetDateTime));
-
-        System.out.println("a");
+//        Timer timer = new Timer();
+//        LocalDateTime targetDateTime = LocalDateTime.now().plusSeconds(5);
+//        timer.schedule(new APIUtil(), java.sql.Timestamp.valueOf(targetDateTime));
         SocketService socketService = new SocketServiceImpl();
         socketService.setServerSocketByKRW();
-        System.out.println("b");
     }
 }

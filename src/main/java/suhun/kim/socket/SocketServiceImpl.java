@@ -61,16 +61,13 @@ public class SocketServiceImpl extends Thread implements SocketService {
     public String logic(String importParam, String importParam1) {
         long startTime = System.currentTimeMillis();
         try {
-
             setSocket(importParam1);
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             byte[] toBytes = truncateToBytes(importParam, 300);
 
             outputStream.write(toBytes);
             outputStream.flush();
-
             log.info("[RFC] SAP -> DEMON: [{}] [{}byte] [{}] ({}sec)\r\n", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
-            log.debug("[SUCCESS] DEMON -> VAN");
 
             DataInputStream reader = new DataInputStream(socket.getInputStream());
 
@@ -99,7 +96,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
             log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
             return "S";
         } catch (IOException e) {
-            log.error("DATA VALUE: {}", e.getMessage());
+            log.error("DATA VALUE: {}\r\n", e.getMessage());
             return "F";
         } finally {
             disconnect();
@@ -125,6 +122,12 @@ public class SocketServiceImpl extends Thread implements SocketService {
                         jCoFunctionBILL.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.BILL"), receiveMessage);
                         jCoFunctionBILL.execute(jCoDestination);
                         log.info("[RECEIVED BILL DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+
+                        StringBuilder stringBuilder = new StringBuilder(receiveMessage);
+                        stringBuilder.setCharAt(24, '1');
+                        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                        dataOutputStream.write(stringBuilder.toString().getBytes());
+                        dataOutputStream.flush();
                     } catch (JCoException e) {
                         log.error("ERROR BILL SERVER SOCKET: {}", e.getMessage());
                     }
@@ -135,6 +138,12 @@ public class SocketServiceImpl extends Thread implements SocketService {
                         jCoFunctionKRW.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KRW"), receiveMessage);
                         jCoFunctionKRW.execute(jCoDestination);
                         log.info("[RECEIVED KRW DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+
+                        StringBuilder stringBuilder = new StringBuilder(receiveMessage);
+                        stringBuilder.setCharAt(21, '1');
+                        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                        dataOutputStream.write(stringBuilder.toString().getBytes());
+                        dataOutputStream.flush();
                     } catch (JCoException e) {
                         log.error("ERROR KRW SERVER SOCKET: {}", e.getMessage());
                     }
@@ -164,6 +173,12 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     jCoFunction.getImportParameterList().setValue(properties.getProperty("JCO.PARAM.IMPORT0.KEB"), receiveMessage);
                     jCoFunction.execute(jCoDestination);
                     log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+
+                    StringBuilder stringBuilder = new StringBuilder(receiveMessage);
+                    stringBuilder.setCharAt(24, '1');
+                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    dataOutputStream.write(stringBuilder.toString().getBytes());
+                    dataOutputStream.flush();
                 } catch (JCoException e) {
                     log.error("ERROR KEB SERVER SOCKET: {}", e.getMessage());
                 }
