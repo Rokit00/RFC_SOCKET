@@ -7,5 +7,5 @@ public interface SocketService {
 
     String logic(String importParam, String importParam1);
 
-    void setServerSocketByKRW();
+    void setServerSocket();
 }
