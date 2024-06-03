@@ -67,14 +67,14 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 case "WON":
                 case "BILL":
                     byte[] sendByte0 = new byte[300];
-                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte0, 0, importParam.getBytes("EUC-KR").length);
+                    System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendByte0, 0, importParam.getBytes("EUC-KR").length);
                     outputStream.write(sendByte0);
                     outputStream.flush();
                     log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte0.length, Arrays.toString(sendByte0), (System.currentTimeMillis() - startTime) * 0.001);
                     break;
                 case "KEB":
                     byte[] sendByte1 = new byte[2000];
-                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte1, 0, importParam1.getBytes("EUC-KR").length);
+                    System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendByte1, 0, importParam1.getBytes("EUC-KR").length);
                     outputStream.write(sendByte1);
                     outputStream.flush();
                     log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte1.length, Arrays.toString(sendByte1), (System.currentTimeMillis() - startTime) * 0.001);
