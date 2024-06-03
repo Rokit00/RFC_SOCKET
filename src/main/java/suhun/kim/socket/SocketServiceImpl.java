@@ -1,6 +1,5 @@
 package suhun.kim.socket;
 
-import suhun.kim.util.APIUtil;
 import suhun.kim.util.Crypt;
 import suhun.kim.util.PropertiesUtil;
 import com.sap.conn.jco.*;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class SocketServiceImpl extends Thread implements SocketService {
@@ -63,11 +61,25 @@ public class SocketServiceImpl extends Thread implements SocketService {
         try {
             setSocket(importParam1);
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-            byte[] toBytes = truncateToBytes(importParam, 300);
 
-            outputStream.write(toBytes);
-            outputStream.flush();
-            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, toBytes.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
+            byte[] sendByte = new byte[0];
+            switch (importParam1) {
+                case "WON":
+                case "BILL":
+                    sendByte = new byte[300];
+                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte, 0, importParam1.getBytes("EUC-KR").length);
+                    outputStream.write(sendByte);
+                    outputStream.flush();
+                    break;
+                case "KEB":
+                    sendByte = new byte[2000];
+                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte, 0, importParam1.getBytes("EUC-KR").length);
+                    outputStream.write(sendByte);
+                    outputStream.flush();
+                    break;
+            }
+
+            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
 
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
@@ -188,7 +200,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                     dataOutputStream.flush();
                     log.info("[RECEIVED KEB DATA] DEMON -> VAN [{}]", stringBuilder);
                 } catch (JCoException e) {
-                    log.error("ERROR KEB SERVER SOCKET: {}", e.getMessage());
+                    log.error("JCO DESTINATION ERROR: {}", e.getMessage());
                 }
             }
         } catch (IOException e) {
@@ -196,26 +208,26 @@ public class SocketServiceImpl extends Thread implements SocketService {
         }
     }
 
-    private byte[] truncateToBytes(String value, int len) throws UnsupportedEncodingException {
-        byte[] bytes = value.getBytes("EUC-KR");
-
-        if (bytes.length <= len) {
-            return value.getBytes();
-        }
-
-        int truncatedLength = len;
-        while (true) {
-            if ((bytes[truncatedLength] & 0xC0) != 0x80) {
-                break;
-            }
-            truncatedLength--;
-        }
-
-        byte[] truncatedBytes = new byte[truncatedLength];
-        System.arraycopy(bytes, 0, truncatedBytes, 0, truncatedLength);
-
-        return truncatedBytes;
-    }
+//    private byte[] truncateToBytes(String value, int len) throws UnsupportedEncodingException {
+//        byte[] bytes = value.getBytes("EUC-KR");
+//
+//        if (bytes.length <= len) {
+//            return value.getBytes();
+//        }
+//
+//        int truncatedLength = len;
+//        while (true) {
+//            if ((bytes[truncatedLength] & 0xC0) != 0x80) {
+//                break;
+//            }
+//            truncatedLength--;
+//        }
+//
+//        byte[] truncatedBytes = new byte[truncatedLength];
+//        System.arraycopy(bytes, 0, truncatedBytes, 0, truncatedLength);
+//
+//        return truncatedBytes;
+//    }
 
     private void setSendToSap(String value, String type) {
         long startTime = System.currentTimeMillis();
