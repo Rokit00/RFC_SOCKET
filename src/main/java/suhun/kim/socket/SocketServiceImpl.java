@@ -116,7 +116,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
     }
 
     @Override
-    public void setServerSocketByKRW() {
+    public void setServerSocket() {
         try {
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(properties.getProperty("SOCKET.PORT.KRW")));
             while (true) {
@@ -207,27 +207,6 @@ public class SocketServiceImpl extends Thread implements SocketService {
             log.error("RECEIVED KEB DATA VALUE [{}]", e.getMessage());
         }
     }
-
-//    private byte[] truncateToBytes(String value, int len) throws UnsupportedEncodingException {
-//        byte[] bytes = value.getBytes("EUC-KR");
-//
-//        if (bytes.length <= len) {
-//            return value.getBytes();
-//        }
-//
-//        int truncatedLength = len;
-//        while (true) {
-//            if ((bytes[truncatedLength] & 0xC0) != 0x80) {
-//                break;
-//            }
-//            truncatedLength--;
-//        }
-//
-//        byte[] truncatedBytes = new byte[truncatedLength];
-//        System.arraycopy(bytes, 0, truncatedBytes, 0, truncatedLength);
-//
-//        return truncatedBytes;
-//    }
 
     private void setSendToSap(String value, String type) {
         long startTime = System.currentTimeMillis();
