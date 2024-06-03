@@ -62,42 +62,31 @@ public class SocketServiceImpl extends Thread implements SocketService {
         try {
             setSocket(importParam1);
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-
-            switch (importParam1) {
-                case "WON":
-                case "BILL":
-                    byte[] sendByte0 = new byte[300];
-                    System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendByte0, 0, importParam.getBytes("EUC-KR").length);
-                    outputStream.write(sendByte0);
-                    outputStream.flush();
-                    log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte0.length, Arrays.toString(sendByte0), (System.currentTimeMillis() - startTime) * 0.001);
-                    break;
-                case "KEB":
-                    byte[] sendByte1 = new byte[2000];
-                    System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendByte1, 0, importParam.getBytes("EUC-KR").length);
-                    outputStream.write(sendByte1);
-                    outputStream.flush();
-                    log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte1.length, Arrays.toString(sendByte1), (System.currentTimeMillis() - startTime) * 0.001);
-                    break;
-            }
-
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
-            byte[] receivedBytes = new byte[0];
+            byte[] sendBytes;
             switch (importParam1) {
                 case "WON":
                 case "BILL":
-                    receivedBytes = new byte[300];
+                    sendBytes = new byte[300];
                     break;
                 case "KEB":
-                    receivedBytes = new byte[2000];
+                    sendBytes = new byte[2000];
                     break;
+                default:
+                    throw new IllegalArgumentException("INCORRECT TYPE: " + importParam1);
             }
+            System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendBytes, 0, importParam.getBytes("EUC-KR").length);
+            outputStream.write(sendBytes);
+            outputStream.flush();
+            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendBytes.length, Arrays.toString(sendBytes), (System.currentTimeMillis() - startTime) * 0.001);
+
+            byte[] receivedBytes = new byte[sendBytes.length];
             dataInputStream.readFully(receivedBytes);
             String receivedMessage = new String(receivedBytes, "EUC-KR");
 
             if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                log.info("NO DATA RECEIVED FROM VAN\r\n");
+                log.info("NO DATA FROM VAN.\r\n");
                 return "F";
             }
 
@@ -108,12 +97,16 @@ public class SocketServiceImpl extends Thread implements SocketService {
             log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
             return "S";
         } catch (IOException e) {
-            log.error("DATA VALUE: {}\r\n", e.getMessage());
+            log.error("DATA: {}\r\n", e.getMessage());
+            return "F";
+        } catch (IllegalArgumentException e) {
+            log.error("{}\r\n", e.getMessage());
             return "F";
         } finally {
             disconnect();
         }
     }
+
 
     @Override
     public void setServerSocket() {
