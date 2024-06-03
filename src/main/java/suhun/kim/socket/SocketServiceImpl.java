@@ -64,38 +64,76 @@ public class SocketServiceImpl extends Thread implements SocketService {
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
-            byte[] sendBytes;
             switch (importParam1) {
                 case "WON":
                 case "BILL":
-                    sendBytes = new byte[300];
+                    byte[] sendBytes = new byte[300];
+                    System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendBytes, 0, importParam.getBytes("EUC-KR").length);
+                    outputStream.write(sendBytes);
+                    outputStream.flush();
+                    log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendBytes.length, Arrays.toString(sendBytes), (System.currentTimeMillis() - startTime) * 0.001);
+
+                    byte[] receivedBytes = new byte[sendBytes.length];
+                    dataInputStream.readFully(receivedBytes);
+                    String receivedMessage = new String(receivedBytes, "EUC-KR");
+
+                    if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
+                        log.info("NO DATA FROM VAN.\r\n");
+                        return "F";
+                    }
+
+                    log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]", importParam1, receivedBytes.length, receivedMessage);
+                    setSendToSap(receivedMessage, importParam1);
+
+                    long endTime = System.currentTimeMillis() - startTime;
+                    log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
+                    return "S";
                     break;
                 case "KEB":
-                    sendBytes = new byte[2000];
+                    byte[] sendBytes1 = new byte[2000];
+                    System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendBytes, 0, importParam.getBytes("EUC-KR").length);
+                    outputStream.write(sendBytes);
+                    outputStream.flush();
+                    log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendBytes.length, Arrays.toString(sendBytes), (System.currentTimeMillis() - startTime) * 0.001);
+
+                    byte[] receivedBytes1 = new byte[sendBytes1.length];
+                    dataInputStream.readFully(receivedBytes1);
+                    String receivedMessage1 = new String(receivedBytes1, "EUC-KR");
+
+                    if (receivedMessage1.isEmpty() || receivedMessage1.equals("NULL")) {
+                        log.info("NO DATA FROM VAN.\r\n");
+                        return "F";
+                    }
+
+                    log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]", importParam1, receivedBytes.length, receivedMessage);
+                    setSendToSap(receivedMessage, importParam1);
+
+                    log.debug("[SUCCESS] UPLOAD ({}sec)", (System.currentTimeMillis() - startTime) * 0.001);
+                    return "S";
                     break;
                 default:
                     throw new IllegalArgumentException("INCORRECT TYPE: " + importParam1);
             }
-            System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendBytes, 0, importParam.getBytes("EUC-KR").length);
-            outputStream.write(sendBytes);
-            outputStream.flush();
-            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendBytes.length, Arrays.toString(sendBytes), (System.currentTimeMillis() - startTime) * 0.001);
-
-            byte[] receivedBytes = new byte[sendBytes.length];
-            dataInputStream.readFully(receivedBytes);
-            String receivedMessage = new String(receivedBytes, "EUC-KR");
-
-            if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
-                log.info("NO DATA FROM VAN.\r\n");
-                return "F";
-            }
-
-            log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]", importParam1, receivedBytes.length, receivedMessage);
-            setSendToSap(receivedMessage, importParam1);
-
-            long endTime = System.currentTimeMillis() - startTime;
-            log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
-            return "S";
+//            System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendBytes, 0, importParam.getBytes("EUC-KR").length);
+//            outputStream.write(sendBytes);
+//            outputStream.flush();
+//            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendBytes.length, Arrays.toString(sendBytes), (System.currentTimeMillis() - startTime) * 0.001);
+//
+//            byte[] receivedBytes = new byte[sendBytes.length];
+//            dataInputStream.readFully(receivedBytes);
+//            String receivedMessage = new String(receivedBytes, "EUC-KR");
+//
+//            if (receivedMessage.isEmpty() || receivedMessage.equals("NULL")) {
+//                log.info("NO DATA FROM VAN.\r\n");
+//                return "F";
+//            }
+//
+//            log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]", importParam1, receivedBytes.length, receivedMessage);
+//            setSendToSap(receivedMessage, importParam1);
+//
+//            long endTime = System.currentTimeMillis() - startTime;
+//            log.debug("[SUCCESS] UPLOAD ({}sec)", endTime * 0.001);
+//            return "S";
         } catch (IOException e) {
             log.error("DATA: {}\r\n", e.getMessage());
             return "F";
