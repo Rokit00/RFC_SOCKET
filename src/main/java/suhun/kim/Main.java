@@ -21,15 +21,4 @@ public class Main {
         SocketService socketService = new SocketServiceImpl();
         socketService.setServerSocket();
     }
-
-    private void test(String s)  {
-        byte[] bytes = new byte[300];
-        try {
-            System.arraycopy(s.getBytes(), 0, bytes, 0, s.getBytes("EUC-KR").length);
-            log.info(Arrays.toString(bytes));
-            log.info("{}", bytes.length);
-        } catch (UnsupportedEncodingException e) {
-            log.info(e.getMessage());
-        }
-    }
 }
