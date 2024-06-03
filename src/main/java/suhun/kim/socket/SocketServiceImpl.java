@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class SocketServiceImpl extends Thread implements SocketService {
@@ -62,24 +63,23 @@ public class SocketServiceImpl extends Thread implements SocketService {
             setSocket(importParam1);
             DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
 
-            byte[] sendByte = new byte[0];
             switch (importParam1) {
                 case "WON":
                 case "BILL":
-                    sendByte = new byte[300];
-                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte, 0, importParam1.getBytes("EUC-KR").length);
-                    outputStream.write(sendByte);
+                    byte[] sendByte0 = new byte[300];
+                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte0, 0, importParam.getBytes("EUC-KR").length);
+                    outputStream.write(sendByte0);
                     outputStream.flush();
+                    log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte0.length, Arrays.toString(sendByte0), (System.currentTimeMillis() - startTime) * 0.001);
                     break;
                 case "KEB":
-                    sendByte = new byte[2000];
-                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte, 0, importParam1.getBytes("EUC-KR").length);
-                    outputStream.write(sendByte);
+                    byte[] sendByte1 = new byte[2000];
+                    System.arraycopy(importParam1.getBytes("EUC-KR"), 0 , sendByte1, 0, importParam1.getBytes("EUC-KR").length);
+                    outputStream.write(sendByte1);
                     outputStream.flush();
+                    log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte1.length, Arrays.toString(sendByte1), (System.currentTimeMillis() - startTime) * 0.001);
                     break;
             }
-
-            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendByte.length, importParam, (System.currentTimeMillis() - startTime) * 0.001);
 
             DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
 
