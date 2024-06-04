@@ -69,17 +69,23 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 case "WON":
                 case "BILL":
                     sendBytes = new byte[300];
+                    String string = importParam.substring(0, 280);
+                    System.arraycopy(string.getBytes("EUC-KR"), 0, sendBytes, 0, string.getBytes("EUC-KR").length);
+                    outputStream.write(sendBytes);
+                    outputStream.flush();
                     break;
                 case "KEB":
                     sendBytes = new byte[2000];
+                    String string1 = importParam.substring(0, 1960);
+                    System.arraycopy(string1.getBytes("EUC-KR"), 0, sendBytes, 0, string1.getBytes("EUC-KR").length);
+                    outputStream.write(sendBytes);
+                    outputStream.flush();
                     break;
                 default:
                     throw new IllegalArgumentException("INCORRECT TYPE: " + importParam1);
             }
-            System.arraycopy(importParam.getBytes("EUC-KR"), 0 , sendBytes, 0, importParam.getBytes("EUC-KR").length-1);
-            outputStream.write(sendBytes);
-            outputStream.flush();
-            log.info("[RFC] DEMON -> VAN: [{}] [{}byte] [{}] ({}sec)", importParam1, sendBytes.length, Arrays.toString(sendBytes), (System.currentTimeMillis() - startTime) * 0.001);
+
+            log.info("[RFC] DEMON -> VAN: [{}] [{}bytes] [{}] ({}sec)", importParam1, sendBytes.length, new String(sendBytes, "EUC-KR"), (System.currentTimeMillis() - startTime) * 0.001);
 
             byte[] receivedBytes = new byte[sendBytes.length];
             dataInputStream.readFully(receivedBytes);
@@ -90,7 +96,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 return "F";
             }
 
-            log.info("[RFC] VAN -> DEMON: [{}] [{}byte] [{}]", importParam1, receivedBytes.length, receivedMessage);
+            log.info("[RFC] VAN -> DEMON: [{}] [{}bytes] [{}]", importParam1, receivedBytes.length, receivedMessage);
             setSendToSap(receivedMessage, importParam1);
 
             long endTime = System.currentTimeMillis() - startTime;
@@ -101,6 +107,9 @@ public class SocketServiceImpl extends Thread implements SocketService {
             return "F";
         } catch (IllegalArgumentException e) {
             log.error("{}\r\n", e.getMessage());
+            return "F";
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.info("sda");
             return "F";
         } finally {
             disconnect();
@@ -121,7 +130,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 dataInputStream.readFully(bytes);
                 String receiveMessage = new String(bytes, "EUC-KR");
                 if (receiveMessage.contains("6000200") || receiveMessage.contains("4000500") || receiveMessage.contains("4000501")) {
-                    log.info("[RECEIVED BILL DATA] VAN -> DEMON [{}byte] [{}] ({}sec)", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                    log.info("[RECEIVED BILL DATA] VAN -> DEMON [{}bytes] [{}] ({}sec)", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                     try {
                         JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
                         JCoFunction jCoFunctionBILL = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.BILL"));
@@ -178,7 +187,7 @@ public class SocketServiceImpl extends Thread implements SocketService {
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 dataInputStream.readFully(bytes);
                 String receiveMessage = new String(bytes, "EUC-KR");
-                log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}byte] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
+                log.info("[RECEIVED KEB DATA] VAN -> DEMON [{}bytes] [{}] ({}sec)\r\n", receiveMessage.getBytes().length, receiveMessage, (System.currentTimeMillis() - startTime) * 0.001);
                 try {
                     JCoDestination jCoDestination = JCoDestinationManager.getDestination(properties.getProperty("JCO.SERVER.REPOSITORY_DESTINATION"));
                     JCoFunction jCoFunction = jCoDestination.getRepository().getFunction(properties.getProperty("JCO.FUNCTION.KEB"));
